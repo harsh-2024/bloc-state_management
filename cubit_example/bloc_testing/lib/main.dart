@@ -18,6 +18,9 @@ class NamesCubit extends Cubit<String?> {
   void pickRandomName() => emit(names.getRandomElement());
 }
 
+/*Cubit is a lightweight state management solution. 
+It is a subset of the bloc package that does not rely on 
+events and instead uses methods to emit new states. */
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
