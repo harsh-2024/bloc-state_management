@@ -21,9 +21,10 @@ class MyApp extends StatelessWidget {
 }
 
 class Contact {
+  final int phno;
   final String id;
   final String name;
-  Contact({required this.name}) : id = Uuid().v4();
+  Contact({required this.name, required this.phno}) : id = Uuid().v4();
 }
 
 // making singleton ContactBook class
@@ -31,19 +32,19 @@ class ContactBook extends ValueNotifier<List<Contact>> {
   ContactBook._sharedInstance() : super([]);
   static final ContactBook _shared = ContactBook._sharedInstance();
   factory ContactBook() => _shared;
-  final List<Contact> _contacts = [];
+  // final List<Contact> _contactsNameName = [];
   int get length => value.length;
 
   void add(Contact contact) {
-    final contacts = value;
-    contacts.add(contact);
+    final contactsName = value;
+    contactsName.add(contact);
     notifyListeners();
   }
 
   void remove(Contact contact) {
-    final contacts = value;
-    if (contacts.contains(contact)) {
-      contacts.remove(contact);
+    final contactsName = value;
+    if (contactsName.contains(contact)) {
+      contactsName.remove(contact);
       notifyListeners();
     }
   }
@@ -65,19 +66,19 @@ class _HomePageState extends State<HomePage> {
     final contactBook = ContactBook();
     return Scaffold(
       appBar: AppBar(
-        title: Text("Your Contacts"),
+        title: Text("Your Contact Book"),
       ),
       body: ValueListenableBuilder(
           valueListenable: ContactBook(),
           builder: (context, value, child) {
-            final contacts = value as List<Contact>;
+            final contactsName = value as List<Contact>;
             return ListView.builder(
-              itemCount: contacts.length,
+              itemCount: contactsName.length,
               itemBuilder: (context, index) {
                 final contact = contactBook.contact(atIndex: index);
                 return Dismissible(
                   onDismissed: (direction) => {
-                    contacts.remove(contact),
+                    contactsName.remove(contact),
                   },
                   key: ValueKey(contact?.id),
                   child: Material(
@@ -85,6 +86,7 @@ class _HomePageState extends State<HomePage> {
                     elevation: 7.0,
                     child: ListTile(
                       title: Text(contact!.name),
+                      subtitle: Text(contact.phno.toString()),
                     ),
                   ),
                 );
@@ -101,7 +103,8 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-late TextEditingController mycontroller;
+late TextEditingController mycontrollerName;
+late TextEditingController mycontrollerNumber;
 
 class NewContactAdd extends StatefulWidget {
   const NewContactAdd({Key? key}) : super(key: key);
@@ -114,13 +117,15 @@ class _NewContactAddState extends State<NewContactAdd> {
   @override
   void initState() {
     // TODO: implement initState
-    mycontroller = TextEditingController();
+    mycontrollerName = TextEditingController();
+    mycontrollerNumber = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
-    mycontroller.dispose();
+    mycontrollerName.dispose();
+    mycontrollerNumber.dispose();
     super.dispose();
   }
 
@@ -134,14 +139,23 @@ class _NewContactAddState extends State<NewContactAdd> {
       body: Column(
         children: [
           TextFormField(
-            controller: mycontroller,
+            controller: mycontrollerName,
             decoration: InputDecoration(
-              hintText: "Add your contact here",
+              hintText: "Contact Name",
+            ),
+          ),
+          TextFormField(
+            controller: mycontrollerNumber,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hintText: "Contact Number",
             ),
           ),
           TextButton(
               onPressed: () {
-                contactBook.add(Contact(name: mycontroller.text));
+                contactBook.add(Contact(
+                    name: mycontrollerName.text,
+                    phno: int.parse(mycontrollerNumber.text)));
                 Navigator.pop(context);
               },
               child: Text("Add"))
